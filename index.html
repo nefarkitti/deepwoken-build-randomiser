@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Randomiser</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="randomiser.js" defer></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <div class="modalOverlay" id="modal">
+        
+        <div class="loading alt">
+            <img src="assets/loading-better.png" alt="">
+        </div>
+    </div>
+    
+    <main>
+
+        <section class="alt">
+            <div class="title">Build Randomiser</div>
+            <div class="containerSect">
+                <div class="container">
+                    <span class="attribute" id="Power">
+                        <span class="name">Power</span>
+                        <span class="amnt">20</span>
+                    </span>
+                    <span class="attribute" id="Race">
+                        <span class="name">Race</span>
+                        <span class="amnt">coming soon</span>
+                    </span>
+                </div>
+                <div class="container">
+                    <span class="attribute" id="Heavy Wep.">
+                        <span class="name">Heavy Wep.</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Medium Wep.">
+                        <span class="name">Medium Wep.</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Light Wep.">
+                        <span class="name">Light Wep.</span>
+                        <span class="amnt">1</span>
+                    </span>
+                </div>
+            </div>
+            <div class="containerSect">
+                <div class="container">
+                    <span class="attribute" id="Strength">
+                        <span class="name">Strength</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Fortitude">
+                        <span class="name">Fortitude</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Agility">
+                        <span class="name">Agility</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Intelligence">
+                        <span class="name">Intelligence</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Willpower">
+                        <span class="name">Willpower</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Charisma">
+                        <span class="name">Charisma</span>
+                        <span class="amnt">1</span>
+                    </span>
+                </div>
+                <div class="container">
+                    <span class="attribute" id="Flamecharm">
+                        <span class="name">Flamecharm</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Frostdraw">
+                        <span class="name">Frostdraw</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Thundercall">
+                        <span class="name">Thundercall</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Galebreathe">
+                        <span class="name">Galebreathe</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Shadowcast">
+                        <span class="name">Shadowcast</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Ironsing">
+                        <span class="name">Ironsing</span>
+                        <span class="amnt">1</span>
+                    </span>
+                </div>
+            </div>
+            <div class="containerSect">
+                <div class="container">
+                    <span class="attribute" id="Vitality">
+                        <span class="name">Vitality</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Erudition">
+                        <span class="name">Erudition</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Proficiency">
+                        <span class="name">Proficiency</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Songchant">
+                        <span class="name">Songchant</span>
+                        <span class="amnt">1</span>
+                    </span>
+                </div>
+                <div class="container">
+                    <span class="attribute" id="Boon 1">
+                        <span class="name">Boon</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Boon 2">
+                        <span class="name">Boon</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Flaw 1">
+                        <span class="name">Flaw</span>
+                        <span class="amnt">1</span>
+                    </span>
+                    <span class="attribute" id="Flaw 2">
+                        <span class="name">Flaw</span>
+                        <span class="amnt">1</span>
+                    </span>
+                </div>
+            </div>
+            <span id="total">total points spent: 0</span>
+            <hr>
+            <span onclick="generateBuild()" class="buttonstylized">randomise build</span>
+        </section>
+
+        <section class="alt">
+            <div class="title" id="title">Talents</div>
+            <div class="container" id="talentContainer">
+
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
