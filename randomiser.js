@@ -7,15 +7,43 @@ modal.style.display = "none"
 let pointsToSpend = 330
 let maxTalents = 75
 let totalPointsSpent = 0
+let maxAttunements = 1
+
+let claimedAttumenets = []
 
 let talents
 let specials
+let weapons
+let bells
 
 let availableExtra = ["Vitality", "Proficiency", "Erudition", "Songchant"]
 let boons = ["Autodidact", "Gourmet", "Maverick", "Packmule", "Scrapper", "Steadfast", "Survivalist", "Sly"]
 let flaws = ["Deficient", "Fugitive", "Vegetarian", "Glutton", "Manic", "Haemophilia", "Squeamish", "Obvious", "Blind"]
+let allAttunements = ["Flamecharm", "Frostdraw", "Thundercall", "Galebreathe", "Shadowcast", "Ironsing"]
 
-axios.get('jsons/talents.json').then(res => {
+const convert = {
+
+    "HVY": "Heavy Wep.",
+    "MED": "Medium Wep.",
+    "LHT": "Light Wep.",
+
+    "STR": "Strength",
+    "FTD": "Fortitude",
+    "AGL": "Agility",
+    "INT": "Intelligence",
+    "WLL": "Willpower",
+    "CHA": "Charisma",
+
+    "FIR": "Flamecharm",
+    "ICE": "Frostdraw",
+    "THD": "Thundercall",
+    "WND": "Galebreathe",
+    "SDW": "Shadowcast",
+    "MTL": "Ironsing"
+
+}
+
+axios.get('https://raw.githubusercontent.com/nefarkitti/deepwoken-related-things/main/jsons/talents.json').then(res => {
     let jsonData = res.data // should be json by default
 
     talents = jsonData
@@ -23,10 +51,26 @@ axios.get('jsons/talents.json').then(res => {
     console.log(jsonData)
 
 }).catch(console.error)
-axios.get('jsons/special.json').then(res => {
+axios.get('https://raw.githubusercontent.com/nefarkitti/deepwoken-related-things/main/jsons/special.json').then(res => {
     let jsonData = res.data // should be json by default
 
     specials = jsonData
+
+    console.log(jsonData)
+
+}).catch(console.error)
+axios.get('https://raw.githubusercontent.com/nefarkitti/deepwoken-related-things/main/jsons/weapons.json').then(res => {
+    let jsonData = res.data // should be json by default
+
+    weapons = jsonData
+
+    console.log(jsonData)
+
+}).catch(console.error)
+axios.get('https://raw.githubusercontent.com/nefarkitti/deepwoken-related-things/main/jsons/bells.json').then(res => {
+    let jsonData = res.data // should be json by default
+
+    bells = jsonData
 
     console.log(jsonData)
 
@@ -124,6 +168,8 @@ let races = [
 let build = {
 
     "Race": "",
+    "Weapon": "",
+    "Bell": "",
 
     "Heavy Wep.": 0,
     "Medium Wep.": 0,
@@ -164,6 +210,42 @@ function getRandomInt(min, max) {
 }
 
 let pool = []
+let weaponPool = []
+
+function generateWeaponPool() {
+
+    weaponPool = []
+
+    for (let i = 0; i < weapons.length-1; i++) {
+
+        let reqs = weapons[i].reqs
+
+        let criteria = 0
+
+        reqs.forEach(requirement=>{
+
+            let split = requirement.split(" ")
+            //console.log(split)
+            let amnt = Number(split[0])
+            let attr = split[1]
+
+            let converted = convert[attr]
+            if (build[converted] >= amnt) {
+                criteria++
+            }
+
+        })
+
+        if (criteria == reqs.length) {
+            weaponPool.push(weapons[i])
+        }
+
+    }
+
+    console.log(weaponPool)
+
+}
+
 function generateCardPool() {
 
     pool = []
@@ -239,16 +321,18 @@ function grabRandomCard() {
 
         })
     }
-    console.log(talent)
+    //console.log(talent)
     if (talentsNames.includes(talent.name)) {
-        console.log(talent.name)
-        console.log("REROLLING DUE TO DUPLICATE")
+        //console.log(talent.name)
+        //console.log("REROLLING DUE TO DUPLICATE")
         return 0
     }
 
     if ((pointsToSpend - pointCost) >= 1) {
 
         let totaltalentpointstospend = 0
+
+        let existingAttunementDecline = false
 
         if (talent.reqs[0] != "") {
             talent.reqs.forEach(requirement=>{
@@ -263,11 +347,22 @@ function grabRandomCard() {
 
                 totaltalentpointstospend += Number(cost)
 
+                if (claimedAttumenets.includes(attr) && allAttunements.includes(attr)) {
+                    // attuenment already claimed
+                    existingAttunementDecline = true
+                } else if (allAttunements.includes(attr) && !claimedAttumenets.includes(attr)) {
+                    if (claimedAttumenets.length >= maxAttunements) {
+                        existingAttunementDecline = true
+                    } else {
+                        claimedAttumenets.push(attr)
+                    }
+                }
+
                 if (Number(cost) <= build[attr]) {
                    cost = 0
                 }
                 
-                if (attr != "Power") {
+                if (attr != "Power" && existingAttunementDecline == false) {
 
                     for (let index = 0; index < Number(cost); index++) {
                         
@@ -284,10 +379,12 @@ function grabRandomCard() {
                 build["Power"] = 20
     
             })
-            talent.totalcost = totaltalentpointstospend
-            build.talents.push(talent)
-            talentsNames.push(talent.name)
-            maxTalents -= 1
+            if (existingAttunementDecline == false) {
+                talent.totalcost = totaltalentpointstospend
+                build.talents.push(talent)
+                talentsNames.push(talent.name)
+                maxTalents -= 1
+            }
         }
 
     } else {
@@ -311,7 +408,7 @@ function displayAll() {
         if (attribute == "talents") return;
         document.getElementById(attribute).innerHTML = `
                         <span class="name">${attribute}</span>
-                        <span class="amnt">${build[attribute]}</span>
+                        <span class="amnt" title="${build[attribute]}">${build[attribute]}</span>
         `
     })
 
@@ -341,12 +438,6 @@ function displayAll() {
     })
 
     talentContainer.innerHTML += `<hr>`
-    talentContainer.innerHTML += `
-                            <span class="attribute">
-                        <span class="name">Total:</span>
-                        <span class="amnt">${totalPointsSpent}</span>
-                        </span>
-    `
 
     document.getElementById("title").innerHTML = `Talents (${build.talents.length})`
     modal.style.display = "none"
@@ -364,9 +455,13 @@ function generateBuild() {
     boons = ["Autodidact", "Gourmet", "Maverick", "Packmule", "Scrapper", "Steadfast", "Survivalist", "Sly"]
     flaws = ["Deficient", "Fugitive", "Vegetarian", "Glutton", "Manic", "Haemophilia", "Squeamish", "Obvious", "Blind"]
     talentsNames = []
+    claimedAttumenets = []
+    maxAttunements = getRandomInt(0, 3)
     build = {
 
         "Race": "None",
+        "Weapon": "",
+        "Bell": "",
 
         "Heavy Wep.": 0,
         "Medium Wep.": 0,
@@ -450,12 +545,15 @@ function generateBuild() {
     }
 
     build["Power"] = 20
+    generateWeaponPool()
+    build["Weapon"] = weaponPool[getRandomInt(0, weaponPool.length)].name
+    build["Bell"] = bells[getRandomInt(0, bells.length)].name
 
     displayAll()
 
     console.log(build)
-    console.log(totalPointsSpent)
-    console.log(talentsNames)
+    //console.log(totalPointsSpent)
+    //console.log(talentsNames)
 
     document.getElementById("total").innerHTML = `total points spent: ${totalPointsSpent}`
 
